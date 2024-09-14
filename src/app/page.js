@@ -138,7 +138,6 @@ export default function IndiaMap() {
             setLoading(false);
 
             function showState(stateData) {
-                setLoading(true);
                 // Hide other states
                 svg.selectAll("path").remove();
                 d3.selectAll(".legend").remove(); // Remove existing legend
@@ -236,7 +235,6 @@ export default function IndiaMap() {
 
                 // Show the reset button
                 d3.select("#reset").style("display", "block");
-                setLoading(false);
             }
 
             // Reset to full map view
