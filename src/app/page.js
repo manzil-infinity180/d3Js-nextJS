@@ -155,7 +155,7 @@ export default function IndiaMap() {
                 const translate = [width / 2 - scale * x, height / 2 - scale * y];
 
                 svg.transition()
-                    .duration(750)
+                    .duration(1050)
                     .call(
                         zoom.transform,
                         d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
