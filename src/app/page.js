@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import '/public/index.css';
 import stateReportData from '../../public/Reports.state_report';
@@ -7,10 +7,12 @@ import districtReportData from '../../public/Reports.district_report';
 export default function IndiaMap() {
     const svgRef = useRef(null);
     const tooltipRef = useRef(null);
+    const [zoomEnabled, setZoomEnabled] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const width = 1400;
-        const height = 900;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
         console.log(stateReportData);
         console.log(districtReportData);
 
@@ -38,7 +40,11 @@ export default function IndiaMap() {
             .scaleExtent([1, 4]) // Adjusted zoom levels
             .on("zoom", zoomed);
 
-        svg.call(zoom);
+        if (zoomEnabled) {
+            svg.call(zoom);
+        } else {
+            svg.on('.zoom', null); // Disable zoom
+        }
 
         function zoomed(event) {
             svg.selectAll('path').attr('transform', event.transform);
@@ -129,6 +135,7 @@ export default function IndiaMap() {
 
             // Create legend for states
             createLegend(stateColorScale, "State Color Scale", 20, 20);
+            setLoading(false);
 
             function showState(stateData) {
                 // Hide other states
@@ -141,8 +148,10 @@ export default function IndiaMap() {
                 const dy = bounds[1][1] - bounds[0][1];
                 const x = (bounds[0][0] + bounds[1][0]) / 2;
                 const y = (bounds[0][1] + bounds[1][1]) / 2;
-                const scale = Math.max(1, Math.min(8, 0.9 / Math.max(dx / width, dy / height)));
-                const translate = [width / (1.5) - scale * x, height / (1.5) - scale * y];
+                // const scale = Math.max(1, Math.min(3, 0.9 / Math.max(dx / width, dy / height)));
+                const scale = Math.max(1, Math.min(3.5, 0.9 / Math.max(dx / width, dy / height)));
+                // const translate = [width / (1.5) - scale * x, height / (1.5) - scale * y];
+                const translate = [width / 2 - scale * x, height / 2 - scale * y];
 
                 svg.transition()
                     .duration(750)
@@ -193,7 +202,8 @@ export default function IndiaMap() {
                             // console.log(districtData);
                             // const districtData_Report = stateData_Report.districtCumulativeCounts;
                             // console.log(districtData_Report);
-                            tooltip.style("visibility", "visible")
+                            if(memberCount, aajeevikaRegisterCount,blockCount){
+                                tooltip.style("visibility", "visible")
                                 .html(`
                                     <h4>${d.properties.Dist_Name}</h4>
                                     <p><strong>State Code:</strong> ${d.properties.State_Code}</p>
@@ -202,6 +212,14 @@ export default function IndiaMap() {
                                     <p><strong>Member Count:</strong> ${memberCount}</p>
                                     <p><strong>Block Count:</strong> ${blockCount}</p>
                                 `);
+                            }else{
+                            tooltip.style("visibility", "visible")
+                                .html(`
+                                    <h4>${d.properties.Dist_Name}</h4>
+                                    <p><strong>State Code:</strong> ${d.properties.State_Code}</p>
+                                    <p><strong>District Code:</strong> ${d.properties.Dist_Code}</p>
+                                `);
+                                }
                         })
                         .on("mousemove", function (event) {
                             tooltip.style("top", (event.pageY - 10) + "px")
@@ -221,39 +239,11 @@ export default function IndiaMap() {
 
             // Reset to full map view
             d3.select("#reset").on("click", function () {
-                svg.transition()
-                    .duration(750)
-                    .call(zoom.transform, d3.zoomIdentity);
-
-                svg.selectAll("path").remove();
-                d3.selectAll(".legend").remove(); // Remove existing legend
-                d3.select("#reset").style("display", "none");
-                window.location.reload();
-                // Redraw the full map
-                svg.selectAll("path")
-                    .data(geojson.features)
-                    .enter().append("path")
-                    .attr("d", path)
-                    .attr("fill", d => stateColorScale(Math.random() * 100000)) // Replace Math.random() with actual data
-                    .attr("stroke", "#fff")
-                    .attr("stroke-width", "0.25")
-                    .on("mouseover", function (event, d) {
-                        tooltip.style("visibility", "visible")
-                            .text(d.properties.ST_NM);
-                    })
-                    .on("mousemove", function (event) {
-                        tooltip.style("top", (event.pageY - 10) + "px")
-                            .style("left", (event.pageX + 10) + "px");
-                    })
-                    .on("mouseout", function () {
-                        tooltip.style("visibility", "hidden");
-                    })
-                    .on("click", function (event, d) {
-                        showState(d);
-                    });
-
-                // Create legend for states
-                createLegend(stateColorScale, "State Color Scale", 20, 20);
+                document.body.style.transition = "opacity 0.5s";
+                document.body.style.opacity = 0;
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
             });
         });
 
@@ -264,12 +254,12 @@ export default function IndiaMap() {
                 behavior: 'smooth'
             });
         });
-    }, []);
+    }, [zoomEnabled,loading]);
 
     return (
         <div>
             <h1 style={{ textAlign: 'center', margin: '20px 0' }}>Jivika Registration Report</h1>
-            <button id="reset" style={{ display: 'none' }} className="styled-button">Show Full Map</button>
+            
             <button id="scroll-down">
                 <div className="arrow-container">
                     <div className="arrow"></div>
@@ -277,9 +267,31 @@ export default function IndiaMap() {
                     <div className="arrow more-faded"></div>
                 </div>
             </button>
-            <div id="chart" style={{ margin: 0 }}></div>
-            <svg ref={svgRef}></svg>
-            <div ref={tooltipRef} className="tooltip"></div>
+            <button
+                id="toggle-zoom"
+                className="toggle-zoom-button"
+                onClick={() => setZoomEnabled(!zoomEnabled)}
+            >
+                {zoomEnabled ? 'Disable Zoom' : 'Enable Zoom'}
+            </button>
+            <button id="reset" style={{ display: 'none' }} className="styled-button toggle-zoom-button">Show Full Map</button>
+            {loading ? (
+                <>
+               <div className="loaderContainer">
+                <div className="loader">
+                    <div className="circle"></div>
+                    <div className="circle"></div>
+                    <div className="circle"></div>
+                </div>
+                </div>
+                </>
+            ) : (
+                <>
+                    <div id="chart" style={{ margin: 0 }}></div>
+                    <svg ref={svgRef}></svg>
+                    <div ref={tooltipRef} className="tooltip"></div>
+                </>
+            )}
             <div className="container">
                 <section className="citizen-corner">
                     <h2 className="section-title">Citizen Corner:</h2>

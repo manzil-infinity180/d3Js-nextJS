@@ -143,7 +143,7 @@ color: #4CAF50;
 }
 #scroll-down {
 position: fixed;
-bottom: 20px;
+bottom: 80px; /* Adjusted to make space for the zoom button */
 right: 20px;
 width: 40px;
 height: 100px;
@@ -156,6 +156,30 @@ outline: none;
 display: flex;
 justify-content: center;
 align-items: center;
+}
+
+#toggle-zoom {
+position: fixed;
+bottom: 20px; /* Positioned below the scroll down button */
+right: 20px;
+background-color: #1e88e5;
+color: white;
+border: none;
+border-radius: 5px;
+padding: 10px 20px;
+font-size: 16px;
+cursor: pointer;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+#toggle-zoom:hover {
+background-color: #1565c0;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+#toggle-zoom:active {
+background-color: #0d47a1;
 }
 
 .arrow-container {
@@ -228,3 +252,63 @@ box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 .styled-button:active {
 background-color: #0d47a1;
 }
+
+.toggle-zoom-button {
+display: block;
+background-color: #1e88e5;
+color: white;
+border: none;
+border-radius: 5px;
+padding: 10px 20px;
+margin: 20px auto 0;
+font-size: 16px;
+cursor: pointer;
+box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+.toggle-zoom-button:hover {
+background-color: #1565c0;
+box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-zoom-button:active {
+background-color: #0d47a1;
+}
+/* components/Loader.module.css */
+.loaderContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    /* background-color: rgba(0, 0, 0, 0.1); */
+  }
+  
+  .loader {
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .circle {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: #3498db;
+    animation: bounce 0.5s ease-in-out infinite;
+  }
+  
+  .circle:nth-child(2) {
+    animation-delay: 0.1s;
+  }
+  
+  .circle:nth-child(3) {
+    animation-delay: 0.2s;
+  }
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-1rem);
+    }
+  }
