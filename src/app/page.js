@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import '/public/index.css';
-import stateReportData from '../../public/Reports.state_report';
-import districtReportData from '../../public/Reports.district_report';
+import stateReportData from '../../private/Reports.state_report';
+import districtReportData from '../../private/Reports.district_report';
 export default function IndiaMap() {
     const svgRef = useRef(null);
     const tooltipRef = useRef(null);
